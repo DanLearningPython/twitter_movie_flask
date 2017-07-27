@@ -1,5 +1,5 @@
-from flask import Flask, Response
-
+from flask import Flask, Response, request
+import sys
 import json
 from flask_pymongo import PyMongo
 
@@ -8,9 +8,22 @@ app.config['MONGO_DBNAME'] = 'twitter'
 mongo = PyMongo(app)
 
 
-@app.route('/')
-def hello_world():
-    tweets = mongo.db.movies.find({})
+@app.route('/', methods = ['GET'])
+def get_tweets():
+
+    mongo_filter = {}
+
+    if 'after' in request.args:
+        after_timestamp = request.args.get("after")
+        after_timestamp = get_int(after_timestamp)
+        if after_timestamp > 0:
+            mongo_filter = {
+                'timestamp': {
+                    '$gte': after_timestamp
+                }
+            }
+
+    tweets = mongo.db.movies.find(mongo_filter)
 
     json_result = to_json(tweets)
 
@@ -20,6 +33,12 @@ def hello_world():
 
     return resp
 
+def get_int(string):
+    try:
+        num = int(string)
+        return num
+    except ValueError:
+        return None
 
 def to_json(mongo_result):
 
