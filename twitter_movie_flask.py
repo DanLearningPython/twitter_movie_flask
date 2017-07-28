@@ -8,7 +8,15 @@ app.config['MONGO_DBNAME'] = 'twitter'
 mongo = PyMongo(app)
 
 
-@app.route('/', methods = ['GET'])
+@app.after_request
+def after_request(response):
+    #CORS support
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
+
+@app.route('/', methods=['GET','POST', 'OPTIONS'])
 def get_tweets():
 
     mongo_filter = {}
