@@ -27,11 +27,11 @@ def get_tweets():
         if after_timestamp > 0:
             mongo_filter = {
                 'timestamp': {
-                    '$gte': after_timestamp
+                    '$gt': after_timestamp
                 }
             }
 
-    tweets = mongo.db.movies.find(mongo_filter)
+    tweets = mongo.db.movies.find(mongo_filter).sort('timestamp', 1 )
 
     json_result = to_json(tweets)
 
